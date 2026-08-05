@@ -1,0 +1,22 @@
+{
+  "name": "Mi banco monetario",
+  "short_name": "Mi banco",
+  "description": "Anota lo que gastas y lo que te entra, y descubre por qué te quedaste sin dinero.",
+  "lang": "es-MX",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5F8FB",
+  "theme_color": "#F5F8FB",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "/nivis.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

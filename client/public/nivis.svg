@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Nivis, la mascota de Mi banco monetario">
+  <rect width="64" height="64" rx="14" fill="#EAF3FA" />
+  <!-- La mascota va al 62% para dejar zona segura y funcionar como icono maskable. -->
+  <g transform="translate(32 33) scale(0.62) translate(-32 -30.5)">
+    <polygon points="13,28 19,7 33,21" fill="#FFFFFF" stroke="#C9D8E4" stroke-width="2" stroke-linejoin="round" />
+    <polygon points="51,28 45,7 31,21" fill="#FFFFFF" stroke="#C9D8E4" stroke-width="2" stroke-linejoin="round" />
+    <polygon points="18,24 20,13 27,21" fill="#D6E7F3" />
+    <polygon points="46,24 44,13 37,21" fill="#D6E7F3" />
+    <circle cx="32" cy="34" r="17" fill="#FFFFFF" stroke="#C9D8E4" stroke-width="2" />
+    <polygon points="24,42 40,42 32,54" fill="#FFFFFF" stroke="#C9D8E4" stroke-width="2" stroke-linejoin="round" />
+    <ellipse cx="25" cy="32" rx="2.6" ry="3" fill="#26313D" />
+    <ellipse cx="39" cy="32" rx="2.6" ry="3" fill="#26313D" />
+    <circle cx="32" cy="46" r="2.4" fill="#1F7FC4" />
+  </g>
+</svg>

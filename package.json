@@ -1,0 +1,24 @@
+{
+  "name": "mi-banco-monetario",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mi banco monetario — control de gastos e ingresos para celular. ¿Por qué me quedé sin dinero?",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm run dev --workspace server",
+    "dev:web": "npm run dev --workspace client",
+    "build": "npm run build --workspace client",
+    "start": "npm run start --workspace server",
+    "seed": "npm run seed --workspace server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
