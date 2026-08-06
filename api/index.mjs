@@ -81,12 +81,23 @@ const responder503 = (res) => {
   res.end(cuerpo);
 };
 
+/**
+ * La revisión de salud es la única ruta que pasa aunque la base esté caída, y
+ * es a propósito: existe justamente para contestar cuando algo no anda. Un
+ * "¿estás vivo?" que se cae con la base no sirve para diagnosticar nada — es
+ * cuando falla lo demás cuando uno necesita saber si el problema es la base o
+ * es que las peticiones ni siquiera están llegando al API.
+ */
+const ES_SALUD = /^\/api\/salud\/?(\?|$)/;
+
 export default async function handler(req, res) {
+  const salud = ES_SALUD.test(req.url || '');
+
   try {
     await conectar();
   } catch (err) {
     console.error('[api] no se pudo conectar a MongoDB:', err.message);
-    return responder503(res);
+    if (!salud) return responder503(res);
   }
 
   return app(req, res);
