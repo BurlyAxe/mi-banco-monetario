@@ -4,11 +4,18 @@
  * A propósito NO cachea /api: los movimientos y el veredicto deben venir
  * siempre del servidor, y una respuesta vieja aquí sería peor que un error.
  */
-const CACHE = 'mbm-cascara-v1';
+const CACHE = 'mbm-cascara-v2';
 const ESENCIALES = ['/', '/index.html', '/manifest.webmanifest', '/nivis.svg'];
 
 self.addEventListener('install', (evento) => {
-  evento.waitUntil(caches.open(CACHE).then((c) => c.addAll(ESENCIALES)));
+  // Uno por uno y sin abortar: con `addAll`, que fallara un solo archivo tiraba
+  // la instalación entera y la app se quedaba sin modo offline por completo.
+  // Guardar tres de cuatro es infinitamente mejor que no guardar ninguno.
+  evento.waitUntil(
+    caches
+      .open(CACHE)
+      .then((c) => Promise.allSettled(ESENCIALES.map((ruta) => c.add(ruta)))),
+  );
   self.skipWaiting();
 });
 
@@ -29,7 +36,16 @@ self.addEventListener('fetch', (evento) => {
 
   // Navegación: red primero, cáscara cacheada como respaldo si no hay señal.
   if (evento.request.mode === 'navigate') {
-    evento.respondWith(fetch(evento.request).catch(() => caches.match('/index.html')));
+    evento.respondWith(
+      fetch(evento.request).catch(async () => {
+        // `caches.match` devuelve undefined cuando no hay nada guardado, y
+        // responder undefined desde aquí rompe la navegación con un error del
+        // navegador. Si de plano no hay cáscara, se dice que falló la red, que
+        // es la verdad y lo que el navegador sabe explicar.
+        const cascara = (await caches.match('/index.html')) || (await caches.match('/'));
+        return cascara || Response.error();
+      }),
+    );
     return;
   }
 

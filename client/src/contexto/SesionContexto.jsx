@@ -14,7 +14,14 @@ export function ProveedorDeSesion({ children }) {
     api
       .yo()
       .then(({ usuario }) => vigente && setUsuario(usuario))
-      .catch(() => borrarToken())
+      .catch((err) => {
+        // Solo un 401 significa que el token dejó de servir, y en ese caso ya
+        // lo borró `pedir`. Que no haya internet, o que el servidor esté
+        // caído, no es motivo para cerrarle la sesión a nadie: antes bastaba
+        // con abrir la app sin señal una vez para tener que volver a teclear
+        // la contraseña. El token se queda y la sesión revive al reconectar.
+        if (err.estado === 401) borrarToken();
+      })
       .finally(() => vigente && setCargando(false));
     return () => {
       vigente = false;

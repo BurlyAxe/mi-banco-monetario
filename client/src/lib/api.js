@@ -48,12 +48,26 @@ async function pedir(ruta, { metodo = 'GET', cuerpo, formulario, params, signal 
     throw new ErrorApi('No hay conexión con el servidor. Revisa tu internet.', 0);
   }
 
-  const datos = await respuesta.json().catch(() => ({}));
+  // Que la respuesta traiga 200 no significa que la haya escrito nuestro API.
+  // Un despliegue mal configurado, un proxy o el wifi de una cafetería pueden
+  // devolver una página HTML con 200 en lugar del JSON esperado. Dando eso por
+  // bueno, `pedir` devolvía un objeto vacío y la app "iniciaba sesión" con un
+  // token `undefined`: sin error, sin datos y con el botón trabado en
+  // "Un momento…" para siempre. Es mucho mejor decir que algo no cuadra.
+  const esJson = (respuesta.headers.get('content-type') || '').includes('application/json');
+  const datos = esJson ? await respuesta.json().catch(() => null) : null;
 
   if (!respuesta.ok) {
     // 401 = el token murió: fuera, y que el contexto de sesión reaccione.
     if (respuesta.status === 401) borrarToken();
-    throw new ErrorApi(datos.error || 'Algo salió mal', respuesta.status, datos.detalles);
+    throw new ErrorApi(datos?.error || 'Algo salió mal', respuesta.status, datos?.detalles);
+  }
+
+  if (!datos) {
+    throw new ErrorApi(
+      'El servidor no respondió lo que esperábamos. Revisa que la dirección del API sea la correcta.',
+      respuesta.status,
+    );
   }
 
   return datos;

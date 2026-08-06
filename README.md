@@ -281,6 +281,34 @@ poco — es el comportamiento correcto, no un error).
 
 ## Para producción
 
+### En Vercel (web y API en el mismo proyecto)
+
+El repo ya viene configurado: `vercel.json` compila el cliente a `client/dist` y
+`api/[...ruta].mjs` publica el MISMO Express como función serverless. Los
+corchetes del nombre no son decorativos: hacen que el archivo atienda cualquier
+ruta bajo `/api`, y como los archivos se resuelven antes que los `rewrites`, el
+catch-all que manda todo a `index.html` —el que hace funcionar las rutas del
+cliente— ya no se traga también las del API.
+
+Web y API quedan en el mismo dominio, así que el cliente usa `/api` sin tocar
+nada y no hace falta configurar CORS.
+
+Lo único que hay que poner a mano, en **Settings → Environment Variables**:
+
+| Variable | Valor |
+| --- | --- |
+| `MONGODB_URI` | La cadena de Atlas, **con el nombre de la base antes del `?`** |
+| `JWT_SECRET` | Una cadena larga y aleatoria, distinta a la de desarrollo |
+| `NODE_ENV` | `production` |
+| `GEMINI_API_KEY` | Opcional: solo si quieres el chat y la lectura de tickets |
+
+En Atlas hay que permitir además el acceso desde cualquier IP (`0.0.0.0/0`) en
+**Network Access**: las funciones serverless no salen siempre por la misma.
+Si falta o falla la conexión, el API responde un 503 diciendo justo eso, en vez
+de reventar sin explicación.
+
+### En cualquier otro lado
+
 1. `npm run build` y sirve `client/dist` como estático.
 2. En el servidor: `NODE_ENV=production`, un `JWT_SECRET` largo y aleatorio, y
    `CORS_ORIGIN` con el dominio real de la web. Si vas a usar el chat, la

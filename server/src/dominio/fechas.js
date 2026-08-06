@@ -9,9 +9,29 @@ const RE_FECHA = /^\d{4}-\d{2}-\d{2}$/;
 const RE_HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
 const RE_MES = /^\d{4}-\d{2}$/;
 
-export const esFechaISO = (valor) => typeof valor === 'string' && RE_FECHA.test(valor);
+/**
+ * Tener la forma correcta no basta: "2026-02-31" y "2026-13-45" pasan la
+ * expresión regular tan campantes, y una fecha que no existe se guarda igual
+ * de bien que una de verdad. Después ya no hay forma de contarla: el mes 13 no
+ * tiene nombre, así que Nivis termina diciéndole al usuario "el domingo 45 de
+ * undefined", y el gasto no aparece en ningún calendario.
+ *
+ * Se arma la fecha en UTC y se comprueba que `Date` no la haya "corregido"
+ * pasándola al mes siguiente. Si los tres números que salen no son los tres que
+ * entraron, ese día no existe.
+ */
+function existeLaFecha(iso) {
+  const [a, m, d] = iso.split('-').map(Number);
+  const f = new Date(Date.UTC(a, m - 1, d));
+  return f.getUTCFullYear() === a && f.getUTCMonth() === m - 1 && f.getUTCDate() === d;
+}
+
+export const esFechaISO = (valor) =>
+  typeof valor === 'string' && RE_FECHA.test(valor) && existeLaFecha(valor);
 export const esHoraISO = (valor) => typeof valor === 'string' && RE_HORA.test(valor);
-export const esMesISO = (valor) => typeof valor === 'string' && RE_MES.test(valor);
+/** Igual que arriba: "2026-99" tiene la forma de un mes, pero no es uno. */
+export const esMesISO = (valor) =>
+  typeof valor === 'string' && RE_MES.test(valor) && esFechaISO(`${valor}-01`);
 
 /**
  * Un día natural va de las 00:00 a las 23:59 del reloj de quien anota. Como la

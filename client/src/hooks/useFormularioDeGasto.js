@@ -1,6 +1,9 @@
 import { useCallback, useState } from 'react';
 import { hoyISO, horaAhora } from '../lib/formato';
 
+/** La hora que se usa cuando no hay ninguna. Es la misma que pone el servidor. */
+const HORA_NEUTRA = '12:00';
+
 /**
  * El estado de un formulario de gasto, venga de donde venga.
  *
@@ -37,7 +40,11 @@ export function useFormularioDeGasto(inicial) {
       categoria: valores.categoria,
       monto: parseFloat(valores.monto),
       fecha: valores.fecha,
-      hora: valores.hora,
+      // El campo de hora se puede vaciar, y una hora en blanco no es una hora:
+      // el servidor la rechazaba con un 400 por un dato que ni siquiera es
+      // obligatorio. Sin ella se usa el mediodía, el mismo valor neutro que el
+      // servidor pone cuando el gasto llega sin hora.
+      hora: valores.hora || HORA_NEUTRA,
     }),
     [valores],
   );

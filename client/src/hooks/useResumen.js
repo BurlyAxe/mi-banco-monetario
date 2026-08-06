@@ -12,6 +12,13 @@ export function useResumen(periodo) {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const vigente = useRef(true);
+  /**
+   * Número de la última petición lanzada. Sin él, cambiar de periodo dos veces
+   * seguidas dejaba dos llamadas en el aire y mandaba la que contestara al
+   * final: bastaba con que "semana" tardara más que "mes" para acabar viendo
+   * los números de la semana con el botón de mes encendido.
+   */
+  const ultima = useRef(0);
 
   useEffect(() => {
     vigente.current = true;
@@ -22,16 +29,19 @@ export function useResumen(periodo) {
 
   const cargar = useCallback(
     async ({ conIndicador = false } = {}) => {
+      const mia = ++ultima.current;
+      const alDia = () => vigente.current && mia === ultima.current;
+
       if (conIndicador) setCargando(true);
       try {
         const respuesta = await api.resumen({ periodo, hoy: hoyISO() });
-        if (!vigente.current) return;
+        if (!alDia()) return;
         setDatos(respuesta);
         setError('');
       } catch (err) {
-        if (vigente.current) setError(err.message);
+        if (alDia()) setError(err.message);
       } finally {
-        if (vigente.current) setCargando(false);
+        if (alDia()) setCargando(false);
       }
     },
     [periodo],

@@ -8,9 +8,19 @@ import { useEffect, useRef } from 'react';
 export default function Hoja({ titulo, subtitulo, onCerrar, children }) {
   const panel = useRef(null);
 
+  // `onCerrar` llega casi siempre como una función escrita en el JSX del
+  // padre, así que cambia de identidad en cada render suyo. Guardarla en una
+  // referencia deja que el efecto de abajo corra UNA vez: si dependiera de
+  // ella, cada re-render del panel (borrar un ingreso, por ejemplo) volvería a
+  // enfocar el primer control de la hoja y le arrancaría el cursor al usuario.
+  const alCerrar = useRef(onCerrar);
+  useEffect(() => {
+    alCerrar.current = onCerrar;
+  });
+
   useEffect(() => {
     const alTeclear = (e) => {
-      if (e.key === 'Escape') onCerrar();
+      if (e.key === 'Escape') alCerrar.current();
     };
     document.addEventListener('keydown', alTeclear);
 
@@ -23,7 +33,7 @@ export default function Hoja({ titulo, subtitulo, onCerrar, children }) {
       document.removeEventListener('keydown', alTeclear);
       document.body.style.overflow = overflowPrevio;
     };
-  }, [onCerrar]);
+  }, []);
 
   return (
     <div className="hoja__fondo" onClick={onCerrar} role="presentation">
