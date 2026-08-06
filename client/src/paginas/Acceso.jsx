@@ -104,12 +104,6 @@ export default function Acceso() {
           {esRegistro ? 'Inicia sesión' : 'Crea tu cuenta'}
         </button>
       </p>
-
-      <p className="acceso__demo">
-        ¿Solo quieres verla con datos? Corre <code>npm run seed</code> y entra con
-        <br />
-        <strong>demo@mibanco.mx</strong> / <strong>demo1234</strong>
-      </p>
     </main>
   );
 }
