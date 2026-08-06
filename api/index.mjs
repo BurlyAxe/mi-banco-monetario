@@ -5,15 +5,16 @@
  * negocio, solo lo que cambia entre una máquina que está siempre encendida y
  * una función que nace y muere con cada petición.
  *
- * ¿Por qué el nombre entre corchetes? Vercel enruta por archivo, y
- * `[...ruta].mjs` significa "cualquier ruta bajo /api, con los segmentos que
- * sea": /api/salud, /api/auth/login y /api/gastos/desde-ticket entran todas
- * aquí. Eso importa porque el archivo se resuelve ANTES que los `rewrites` de
- * vercel.json, así que el catch-all que manda todo a index.html —el que hace
- * funcionar las rutas del cliente— ya no se traga también las del API. Esa era
- * exactamente la razón por la que el sitio desplegado no servía: cualquier
- * /api/* devolvía la página de React con un 200, el navegador la tomaba por
- * una respuesta buena y la app se quedaba mirando al vacío.
+ * Todas las rutas del API entran por este único archivo. El reparto lo hace el
+ * primer `rewrite` de vercel.json, que manda `/api/(.*)` aquí ANTES de que el
+ * catch-all mande el resto a `index.html`. El orden es lo importante: ese
+ * catch-all —el que hace funcionar las rutas del cliente— se estaba tragando
+ * también las del API, y por eso el sitio desplegado no servía para nada.
+ * Cualquier `/api/*` devolvía la página de React con un 200, el navegador la
+ * daba por buena y la app se quedaba mirando al vacío.
+ *
+ * La función recibe la ruta original completa en `req.url` ("/api/auth/login",
+ * no "/api"), que es justo lo que Express necesita para repartir.
  *
  * `.mjs` y no `.js` porque el código del servidor usa `import`, y el
  * package.json de la raíz no declara `"type": "module"`.

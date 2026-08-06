@@ -4,12 +4,15 @@
   "outputDirectory": "client/dist",
   "installCommand": "npm install",
   "functions": {
-    "api/*.mjs": {
+    "api/index.mjs": {
       "memory": 1024,
       "maxDuration": 60
     }
   },
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/sw.js",
