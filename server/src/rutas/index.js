@@ -17,6 +17,7 @@ import {
   esquemaChat,
 } from '../esquemas.js';
 import { recibirImagen } from '../middleware/subidaDeImagen.js';
+import { estadoDeLaBase } from '../config/db.js';
 
 import * as auth from '../controladores/autenticacion.js';
 import * as gastos from '../controladores/gastos.js';
@@ -66,7 +67,20 @@ const limiteTicket = rateLimit({
   message: { error: 'Demasiadas lecturas seguidas. Espera unos minutos o anota el gasto a mano.' },
 });
 
-rutas.get('/salud', (_req, res) => res.json({ ok: true, servicio: 'mi-banco-monetario' }));
+/**
+ * ¿Está vivo esto, y puede hacer su trabajo?
+ *
+ * Son dos preguntas y antes solo contestaba la primera, siempre que sí. Un
+ * "ok: true" mientras la base estaba caída no es que fuera inútil: es que
+ * despistaba, porque parecía la prueba de que todo iba bien justo cuando nada
+ * funcionaba. Ahora `ok` sigue diciendo que el API responde —para eso existe,
+ * para poder contestar cuando lo demás falla— y `base` dice si además se
+ * puede usar la app, con el motivo cuando no.
+ */
+rutas.get('/salud', (_req, res) => {
+  const base = estadoDeLaBase();
+  res.json({ ok: true, servicio: 'mi-banco-monetario', base });
+});
 
 /** Catálogos que el cliente usa para armar los chips y selectores. */
 rutas.get('/catalogos', (_req, res) =>

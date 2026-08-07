@@ -23,6 +23,7 @@ import mongoose from 'mongoose';
 
 import { env } from '../server/src/config/env.js';
 import { crearApp } from '../server/src/app.js';
+import { anotarFalloDeConexion } from '../server/src/config/db.js';
 
 /**
  * La conexión a Mongo, compartida entre invocaciones.
@@ -48,10 +49,17 @@ function conectar() {
         // instancia no acelera nada y sí agota el plan.
         maxPoolSize: 5,
       })
+      .then((m) => {
+        anotarFalloDeConexion(null);
+        return m;
+      })
       // Un intento fallido no se guarda: si se cachea el rechazo, la función
       // se queda envenenada hasta que Vercel decida reciclarla.
       .catch((err) => {
         conexion = null;
+        // Se anota para que `/api/salud` pueda contarlo. Sin esto, el motivo
+        // real solo vivía en los registros de Vercel.
+        anotarFalloDeConexion(err);
         throw err;
       });
   }
