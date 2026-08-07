@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "Mi banco monetario",
   "short_name": "Mi banco",
   "description": "Anota lo que gastas y lo que te entra, y descubre por qué te quedaste sin dinero.",
@@ -8,15 +9,59 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#F5F8FB",
-  "theme_color": "#F5F8FB",
+  "background_color": "#E9F0F6",
+  "theme_color": "#E9F0F6",
   "categories": ["finance", "productivity"],
   "icons": [
+    {
+      "src": "/iconos/icono-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/iconos/icono-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/iconos/icono-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/iconos/icono-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "/nivis.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Anotar un gasto",
+      "short_name": "Gasto",
+      "description": "Registrar algo que acabas de gastar",
+      "url": "/?accion=gasto"
+    },
+    {
+      "name": "Escanear un ticket",
+      "short_name": "Ticket",
+      "description": "Leer un ticket con la cámara y anotarlo solo",
+      "url": "/?accion=ticket"
+    },
+    {
+      "name": "Anotar un ingreso",
+      "short_name": "Ingreso",
+      "description": "Registrar dinero que te entró",
+      "url": "/?accion=ingreso"
     }
   ]
 }

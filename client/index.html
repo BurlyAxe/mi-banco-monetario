@@ -5,13 +5,51 @@
     <!-- viewport-fit=cover para poder usar las safe-area del notch -->
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="Mi banco monetario: anota lo que gastas y lo que te entra, y descubre por qué te quedaste sin dinero." />
-    <meta name="theme-color" content="#F5F8FB" />
+    <!-- El fondo real del body (--fondo-app). Antes decía #F5F8FB, que es el
+         de las tarjetas: la barra del sistema quedaba de un azul distinto al de
+         la pantalla, y en la app instalada esa costura se ve todo el rato. El
+         mismo color va en el manifiesto y en las pantallas de arranque. -->
+    <meta name="theme-color" content="#E9F0F6" />
+    <!-- El estándar que mira Chrome; el de `apple-` es el mismo para Safari. -->
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Mi banco monetario" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/nivis.svg" />
-    <link rel="apple-touch-icon" href="/nivis.svg" />
+    <!-- iOS no entiende SVG en el icono de la pantalla de inicio: sin un PNG
+         aquí, guardar la app deja un cuadro gris con una miniatura de la web. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/iconos/apple-touch-icon.png" />
+
+    <!-- Pantallas de arranque de iOS. Safari no las saca del manifiesto: si no
+         encuentra una del tamaño exacto del aparato enseña un rectángulo blanco
+         mientras carga, y en una app de fondo azul ese destello es lo primero
+         que se ve al abrirla. Las genera `node scripts/generar-splash.mjs`, que
+         además imprime estas mismas etiquetas para pegarlas aquí. -->
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-640x1136.png"
+      media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-750x1334.png"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-1242x2208.png"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-828x1792.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-1125x2436.png"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-1242x2688.png"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-1170x2532.png"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-1284x2778.png"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-1179x2556.png"
+      media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-1290x2796.png"
+      media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-1206x2622.png"
+      media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="/iconos/arranque/arranque-1320x2868.png"
+      media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

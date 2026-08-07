@@ -2370,3 +2370,221 @@ button:disabled {
     max-width: 428px;
   }
 }
+
+/* ------------------------------------------------- instalar en la pantalla */
+
+/* Hermana de .consejo, con el borde punteado que dice "esto es un ofrecimiento,
+   no una parte de tus cuentas". Solo aparece si de verdad se puede instalar. */
+.instalar {
+  background: var(--azul-suave);
+  border: 1px dashed var(--azul-borde-fuerte);
+  border-radius: var(--radio);
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.instalar__cara {
+  flex: none;
+  margin-top: 2px;
+}
+
+.instalar__cuerpo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.instalar__etiqueta {
+  font-size: 10px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  letter-spacing: 0.09em;
+  color: #6fa6ce;
+}
+
+.instalar__texto {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--tinta);
+}
+
+.instalar__pasos {
+  margin: 2px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--tinta-suave);
+}
+
+.instalar__pasos strong {
+  color: var(--tinta);
+  font-weight: 600;
+}
+
+.instalar__acciones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* No ocupa todo el ancho como el resto de botones primarios: al lado de
+   "Ahora no" tienen que leerse como dos opciones, no como una y su letra chica. */
+.instalar__boton {
+  width: auto;
+  padding: 10px 18px;
+  font-size: 13.5px;
+}
+
+.instalar__no {
+  border: none;
+  background: transparent;
+  color: var(--gris-boton);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 6px;
+  cursor: pointer;
+}
+
+.instalar__no:hover {
+  color: var(--tinta-suave);
+}
+
+/* ---------------------------------------------------------- sin conexión */
+
+/* Por encima de todo, hojas incluidas (z-index 40): el momento en que más
+   importa saber que no hay línea es justo cuando estás tecleando un gasto que
+   no se va a poder guardar. Ámbar y no rojo: no es un error, es un aviso. */
+.sin-conexion {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: calc(7px + var(--seguro-arriba)) 14px 7px;
+  background: #4a3f2c;
+  color: #f6ecd8;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: center;
+  animation: bajar 0.22s ease-out;
+}
+
+@keyframes bajar {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.sin-conexion__punto {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e8b45c;
+  animation: latir 1.8s ease-in-out infinite;
+}
+
+@keyframes latir {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ------------------------------------------------------ versión nueva */
+
+/* Debajo de las hojas a propósito (z-index 40): actualizar puede esperar a que
+   el usuario termine lo que está haciendo, y taparle la hoja abierta con un
+   botón que le va a recargar la página sería el peor momento posible. */
+.actualizar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(92px + var(--seguro-abajo));
+  transform: translateX(-50%);
+  z-index: 36;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: min(360px, calc(100vw - 32px));
+  padding: 11px 12px 11px 16px;
+  border-radius: 16px;
+  background: var(--tinta);
+  color: #f2f7fb;
+  font-size: 13px;
+  box-shadow: 0 10px 28px rgba(38, 49, 61, 0.22);
+  animation: aparecerPildora 0.24s ease-out;
+}
+
+.actualizar__texto {
+  line-height: 1.35;
+}
+
+.actualizar__boton {
+  flex: none;
+  border: none;
+  background: var(--acento-vivo);
+  color: #ffffff;
+  border-radius: 11px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.actualizar__boton:hover {
+  background: var(--acento);
+}
+
+/* ------------------------------------------------- panel sin datos */
+
+/* Cuando no hay nada que enseñar —sin señal o con el servidor caído— la app no
+   se queda en una alerta suelta arriba del todo. Se centra, se pone la cara de
+   Nivis y se explica, que es lo único que se puede ofrecer en ese momento. */
+.app--vacia {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+  padding-bottom: calc(40px + var(--seguro-abajo));
+}
+
+.vacia__titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--tinta);
+}
+
+.vacia__texto {
+  margin: -6px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--tinta-suave);
+  max-width: 32ch;
+}
+
+.app--vacia .boton-primario {
+  width: auto;
+  padding: 13px 28px;
+}

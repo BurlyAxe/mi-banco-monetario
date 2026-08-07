@@ -2,12 +2,53 @@
  * Cliente HTTP del API. En desarrollo Vite hace proxy de /api al servidor
  * Express; en producción se apunta con VITE_API_URL.
  */
+import { reportarFalloDeRed, reportarRespuesta } from './conexion';
+
 const BASE = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 const LLAVE_TOKEN = 'mbm.token';
+const LLAVE_USUARIO = 'mbm.usuario';
 
 export const leerToken = () => localStorage.getItem(LLAVE_TOKEN);
 export const guardarToken = (token) => localStorage.setItem(LLAVE_TOKEN, token);
-export const borrarToken = () => localStorage.removeItem(LLAVE_TOKEN);
+
+/**
+ * Cerrar sesión borra las dos cosas, siempre.
+ *
+ * El perfil guardado sin su token no sirve para nada —no abre ninguna
+ * petición— y dejarlo suelto solo sirve para que la siguiente persona que use
+ * el teléfono vea un nombre que no es el suyo.
+ */
+export const borrarToken = () => {
+  localStorage.removeItem(LLAVE_TOKEN);
+  localStorage.removeItem(LLAVE_USUARIO);
+};
+
+/**
+ * Copia del perfil, para poder abrir la app sin señal.
+ *
+ * No es una caché de datos: los números siguen viniendo siempre del servidor y
+ * sin conexión no se enseña ni uno. Esto contesta a otra pregunta, la de "¿de
+ * quién es esta sesión?", y es la que hacía falta para no mandar a la pantalla
+ * de acceso a alguien que ya entró. Sin ella, abrir la app instalada en el
+ * metro te dejaba mirando un formulario de acceso que tampoco podía enviarse:
+ * un callejón sin salida, y con toda la pinta de que la app se había roto y te
+ * había cerrado la sesión.
+ *
+ * Aquí no va nada secreto —nombre y ajustes— y el token, que sí lo es, ya vive
+ * en este mismo cajón.
+ */
+export const leerUsuario = () => {
+  try {
+    return JSON.parse(localStorage.getItem(LLAVE_USUARIO));
+  } catch {
+    // Un JSON a medias es basura de una versión anterior, no un error que
+    // haya que contarle a nadie: se ignora y se revalida contra el servidor.
+    return null;
+  }
+};
+
+export const guardarUsuario = (usuario) =>
+  localStorage.setItem(LLAVE_USUARIO, JSON.stringify(usuario));
 
 export class ErrorApi extends Error {
   constructor(mensaje, estado, detalles) {
@@ -45,8 +86,16 @@ async function pedir(ruta, { metodo = 'GET', cuerpo, formulario, params, signal 
   } catch (err) {
     // Cancelar no es fallar: quien abortó ya sabe por qué y decide qué hacer.
     if (err.name === 'AbortError') throw err;
+    // Aquí es donde se ve de verdad si hay línea. `navigator.onLine` se
+    // conforma con que haya wifi; esto es una petición nuestra que no llegó.
+    reportarFalloDeRed();
     throw new ErrorApi('No hay conexión con el servidor. Revisa tu internet.', 0);
   }
+
+  // Contestó el servidor. Da igual con qué: un 500 es un problema del API, no
+  // de la red, y dejar encendido el aviso de "sin conexión" señalaría al sitio
+  // equivocado.
+  reportarRespuesta();
 
   // Que la respuesta traiga 200 no significa que la haya escrito nuestro API.
   // Un despliegue mal configurado, un proxy o el wifi de una cafetería pueden

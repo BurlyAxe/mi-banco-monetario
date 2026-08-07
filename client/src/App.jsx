@@ -3,6 +3,8 @@ import { ProveedorDeSesion, useSesion } from './contexto/SesionContexto.jsx';
 import Acceso from './paginas/Acceso.jsx';
 import Panel from './paginas/Panel.jsx';
 import Cargando from './componentes/Cargando.jsx';
+import AvisoDeConexion from './componentes/AvisoDeConexion.jsx';
+import AvisoDeActualizacion from './componentes/AvisoDeActualizacion.jsx';
 
 function RutaPrivada({ children }) {
   const { usuario, cargando } = useSesion();
@@ -19,6 +21,11 @@ function RutaPublica({ children }) {
 export default function App() {
   return (
     <ProveedorDeSesion>
+      {/* Fuera de las rutas: valen igual en el panel que en la pantalla de
+          acceso, y no tienen por qué volver a montarse al navegar. */}
+      <AvisoDeConexion />
+      <AvisoDeActualizacion />
+
       <Routes>
         <Route
           path="/acceso"

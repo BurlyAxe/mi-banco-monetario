@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useSesion } from '../contexto/SesionContexto.jsx';
 import { useResumen } from '../hooks/useResumen.js';
 import { api } from '../lib/api';
+import { hayConexion, suscribirse as suscribirseAConexion } from '../lib/conexion';
 import { dinero, etiquetaDeMes, hoyISO } from '../lib/formato';
 
 import Encabezado from '../componentes/Encabezado.jsx';
@@ -13,6 +14,8 @@ import TarjetaConsejo from '../componentes/TarjetaConsejo.jsx';
 import GraficaGastos from '../componentes/GraficaGastos.jsx';
 import BuscadorDeGastos from '../componentes/BuscadorDeGastos.jsx';
 import AccionesFlotantes from '../componentes/AccionesFlotantes.jsx';
+import AvisoDeInstalacion from '../componentes/AvisoDeInstalacion.jsx';
+import Nivis from '../componentes/Nivis.jsx';
 import Pildora from '../componentes/Pildora.jsx';
 import HojaGasto from '../componentes/HojaGasto.jsx';
 import HojaTicket from '../componentes/HojaTicket.jsx';
@@ -53,6 +56,37 @@ export default function Panel() {
   const [editandoIngreso, setEditandoIngreso] = useState(null);
 
   const temporizador = useRef(null);
+
+  const conectado = useSyncExternalStore(suscribirseAConexion, hayConexion, () => true);
+  const estabaConectado = useRef(conectado);
+
+  /**
+   * Al volver la señal se piden los números otra vez, solos.
+   *
+   * Si no, la app se queda enseñando el error del momento en que se cayó hasta
+   * que el usuario toque algo — y como el aviso de arriba acaba de desaparecer,
+   * lo que ve es una app con línea que insiste en que no la tiene.
+   */
+  useEffect(() => {
+    if (conectado && !estabaConectado.current) recargar();
+    estabaConectado.current = conectado;
+  }, [conectado, recargar]);
+
+  /**
+   * Atajos del icono: en Android, dejar pulsada la app ofrece "Anotar un
+   * gasto", "Escanear un ticket" y "Anotar un ingreso". Cada uno entra por
+   * `/?accion=…` y abre esa hoja directamente.
+   *
+   * La URL se limpia en cuanto se usa: si se quedara puesta, recargar la app
+   * —o volver a ella días después— reabriría la hoja como si el usuario la
+   * hubiera pedido otra vez.
+   */
+  useEffect(() => {
+    const accion = new URLSearchParams(window.location.search).get('accion');
+    if (!['gasto', 'ticket', 'ingreso'].includes(accion)) return;
+    setHoja(accion);
+    window.history.replaceState({}, '', window.location.pathname);
+  }, []);
 
   // La píldora se va sola a los 4.2 s, como en el diseño.
   const mostrarPildora = useCallback((texto) => {
@@ -147,10 +181,22 @@ export default function Panel() {
 
   if (cargando && !datos) return <Cargando texto="Contando tu dinero…" />;
 
+  /**
+   * Sin datos que enseñar. Estando sin señal se dice eso y no "algo salió
+   * mal": son dos problemas distintos, con dos soluciones distintas, y en una
+   * app instalada —sin barra de navegador donde ver que la página no cargó—
+   * confundirlos hace que una tarde en el metro parezca la app rota.
+   */
   if (!datos) {
     return (
-      <main className="app">
-        <p className="alerta">{error || 'No pudimos cargar tus movimientos.'}</p>
+      <main className="app app--vacia">
+        <Nivis pose="cuerpo" ancho={92} alto={126} />
+        <h1 className="vacia__titulo">{conectado ? 'No pudimos abrir tu banco' : 'Aquí no llega la señal'}</h1>
+        <p className="vacia__texto">
+          {conectado
+            ? error || 'No pudimos cargar tus movimientos.'
+            : 'Tus números viven en el servidor y ahorita no se puede llegar a él. En cuanto vuelva la conexión aparecen solos, sin que tengas que hacer nada.'}
+        </p>
         <button type="button" className="boton-primario" onClick={() => recargar({ conIndicador: true })}>
           Reintentar
         </button>
@@ -237,6 +283,8 @@ export default function Panel() {
         onEditarGasto={setEditandoGasto}
         onGuardarGasto={(id, cambios) => guardarEdicion('gasto', id, cambios)}
       />
+
+      <AvisoDeInstalacion />
 
       <p className="pie">Mi banco monetario · los números no juzgan, solo apuntan.</p>
 
