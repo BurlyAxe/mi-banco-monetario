@@ -1,12 +1,38 @@
 import 'dotenv/config';
 
+/**
+ * Variables que en producción se quedaron sin poner y acabaron tirando del
+ * valor de desarrollo.
+ *
+ * Existe porque esa caída es silenciosa y cara. `MONGODB_URI` sin poner no
+ * daba un error al arrancar: dejaba el servidor apuntando a localhost, donde
+ * no hay ninguna base, y el sitio publicado contestaba a cada intento de
+ * entrar con un "no se pudo conectar" que parecía un problema de red o de
+ * permisos de Atlas. Se perdió más de un rato buscando en el sitio equivocado.
+ *
+ * Y `JWT_SECRET` sin poner es peor que una avería: firma las sesiones con una
+ * cadena que está escrita en el repositorio, o sea a la vista de cualquiera
+ * que sepa leer. Por eso no se calla y por eso `autenticar` se niega a usarla.
+ */
+const faltantes = [];
+
 const requerido = (clave, porDefecto) => {
-  const valor = process.env[clave] ?? porDefecto;
-  if (valor === undefined || valor === '') {
+  const valor = process.env[clave];
+  if (valor !== undefined && valor !== '') return valor;
+
+  // En producción no existe el "valor por defecto razonable": apuntar a
+  // localhost o firmar con un secreto público no es un default, es una avería
+  // que además no se ve. Se anota para poder contarla.
+  if (process.env.NODE_ENV === 'production') faltantes.push(clave);
+
+  if (porDefecto === undefined || porDefecto === '') {
     throw new Error(`Falta la variable de entorno ${clave}. Copia server/.env.example a server/.env.`);
   }
-  return valor;
+  return porDefecto;
 };
+
+/** Qué falta por configurar. Vacío = todo en su sitio. */
+export const faltanVariables = () => [...faltantes];
 
 export const env = {
   puerto: Number(process.env.PORT || 4000),

@@ -18,6 +18,7 @@ import {
 } from '../esquemas.js';
 import { recibirImagen } from '../middleware/subidaDeImagen.js';
 import { estadoDeLaBase } from '../config/db.js';
+import { faltanVariables } from '../config/env.js';
 
 import * as auth from '../controladores/autenticacion.js';
 import * as gastos from '../controladores/gastos.js';
@@ -78,8 +79,16 @@ const limiteTicket = rateLimit({
  * puede usar la app, con el motivo cuando no.
  */
 rutas.get('/salud', (_req, res) => {
-  const base = estadoDeLaBase();
-  res.json({ ok: true, servicio: 'mi-banco-monetario', base });
+  const faltan = faltanVariables();
+  res.json({
+    ok: true,
+    servicio: 'mi-banco-monetario',
+    base: estadoDeLaBase(),
+    // Se dice el NOMBRE de lo que falta, nunca el valor de lo que sí está.
+    // Un "ECONNREFUSED 127.0.0.1" hay que saber traducirlo; "falta
+    // MONGODB_URI" ya es la instrucción.
+    ...(faltan.length ? { configuracion: { faltan } } : {}),
+  });
 });
 
 /** Catálogos que el cliente usa para armar los chips y selectores. */
